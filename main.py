@@ -2,11 +2,14 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 import asyncio
-from gtoken import retornatoken
+from gtoken import *
 
-comando = ["$turma entrar", "$turma sair", "$turma entrar", "$infos"]
+
+comando = ["turma entrar", "turma sair", "turma add", "info", "alterar prefix"]
 
 client = discord.Client()
+
+prefixo =  Prefixo()
 
 msg_id = None
 msg_user = None
@@ -16,17 +19,17 @@ async def on_ready():
     print('Rodando {0.user}'.format(client))
 
 @client.event
-async def on_message(message):
+async def on_message(message, prefixo = prefixo):
     if message.author == client.user:
         return
-
-    if message.content.startswith('fodase! turma add'):
+ 
+    if message.content.startswith((prefixo.retornaPrefix() + ' turma add')):
         await message.channel.send('Esse comando permite que você adicione uma turma/cargo!')
     
-    elif message.content.startswith('fodase! turma sair'):
+    elif message.content.startswith((prefixo.retornaPrefix() + ' turma sair')):
         await message.channel.send('Esse comando permite que você  saia de uma turma/cargo que você está incluso!')
     
-    elif message.content.startswith('fodase! turma entrar'):
+    elif message.content.startswith((prefixo.retornaPrefix() + ' turma entrar')):
         embed1 = discord.Embed(
                     title="Escolha a turma que deseja entrar!",
                     color=0x690FC3,
@@ -42,18 +45,20 @@ async def on_message(message):
         global msg_id
         msg_id = botmsg.id
 
-    elif message.content.startswith('fodase! info'):
+    elif message.content.startswith((prefixo.retornaPrefix() + ' info')):
         await message.channel.send('O BODOC tem como objetivo reunir alunos das mesmas turmas ' +
         'facilitando assim a comunicação entre eles.')
         mensagem = "\nEsses são todos os comandos disponiveis:"
         for item in comando:
-            if item == "$infos":
-                mensagem += "\n" + item
-            else:
-                mensagem += "\n" + item + " nome_da_turma"
+            mensagem += "\n" + prefixo.retornaPrefix() + " " + item
         await message.channel.send(mensagem)
         
- 
+    elif message.content.startswith((prefixo.retornaPrefix() + ' alterar prefix')):
+        prefixo.alteraPrefix(message.content.split()[3])
+        await message.channel.send('Prefixo alterado para ' + prefixo.retornaPrefix())
+
+        
+    #    await message.channel.send('Esse comando permite que você  saia de uma turma/cargo que você está incluso!')
     global msg_user
     msg_user = message.author
 
