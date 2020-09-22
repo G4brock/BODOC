@@ -36,9 +36,11 @@ async def on_message(message):
 
         botmsg = await message.channel.send(embed=embed1)
 
-        await message.add_reaction(botmsg, "🐤")
-        await message.add_reaction("📘")
-        await message.add_reaction("📙")
+        await botmsg.add_reaction("🐤")
+        await botmsg.add_reaction("📘")
+        await botmsg.add_reaction("📙")
+        global msg_id
+        msg_id = botmsg.id
 
     elif message.content.startswith('fodase! info'):
         await message.channel.send('O BODOC tem como objetivo reunir alunos das mesmas turmas ' +
@@ -51,8 +53,7 @@ async def on_message(message):
                 mensagem += "\n" + item + " nome_da_turma"
         await message.channel.send(mensagem)
         
-    global msg_id
-    msg_id = botmsg.id
+ 
     global msg_user
     msg_user = message.author
 
@@ -60,34 +61,27 @@ async def on_message(message):
 async def on_reaction_add(reaction, user):
     msg = reaction.message
 
-    if reaction.emoji == "🐤" and msg.id == msg_id and user == msg_user:
-        #role = discord.utils.find(lambda r: r.name == "IHC", msg.guild.roles)
-        await user.add_roles(user,  (discord.role(id="IHC")))
+    if reaction.emoji == "🐤" and msg.id == msg_id and user.id != client.user.id:
+        await user.add_roles(get(reaction.message.guild.roles, name="IHC"))
+
+    elif reaction.emoji == "📘" and msg.id == msg_id and user.id != client.user.id:
+        await user.add_roles(get(reaction.message.guild.roles, name="Grafos"))
+
+    elif reaction.emoji == "📙" and msg.id == msg.id and user.id != client.user.id:
+         await user.add_roles(get(reaction.message.guild.roles, name="LIP-Rodrigo"))
 
 
-    #elif reaction.emoji == "📘" and msg.id == msg.id and user == msg_user:
-    #    role = discord.utils.find(lambda r: r.name == "Grafos", msg.server.roles)
-    #    await client.add_roles(user, role)
+@client.event
+async def on_reaction_remove(reaction, user):
+    msg = reaction.message
 
-    #elif reaction.emoji == "📙" and msg.id == msg.id and user == msg_user:
-    #    role = discord.utils.find(lambda r: r.name == "LIP-Rodrigo", msg.server.roles)
-    #    await client.add_roles(user, role)
+    if reaction.emoji == "🐤" and msg.id == msg_id and user.id != client.user.id:
+        await user.remove_roles(get(reaction.message.guild.roles, name="IHC"))
 
+    elif reaction.emoji == "📘" and msg.id == msg_id and user.id != client.user.id:
+        await user.remove_roles(get(reaction.message.guild.roles, name="Grafos"))
 
-#@client.event
-#async def on_reaction_remove(reaction, user):
-#    msg = reaction
-#
-#    if reaction.emoji == "🐤" and msg.id == msg.id and user == msg_user:
-#        role = discord.utils.find(lambda r: r.name == "IHC", msg.server.roles)
-#        await client.remove_roles(user, role)
-#
-#    elif reaction.emoji == "📘" and msg.id == msg.id and user == msg_user:
-#        role = discord.utils.find(lambda r: r.name == "Grafos", msg.server.roles)
-#        await client.remove_roles(user, role)
-#
-#    elif reaction.emoji == "📙" and msg.id == msg.id and user == msg_user:
-#        role = discord.utils.find(lambda r: r.name == "LIP-Rodrigo", msg.server.roles)
-#        await client.remove_roles(user, role)
+    elif reaction.emoji == "📙" and msg.id == msg.id and user.id != client.user.id:
+         await user.remove_roles(get(reaction.message.guild.roles, name="LIP-Rodrigo"))
 
 client.run(retornatoken())
